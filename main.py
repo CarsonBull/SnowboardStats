@@ -21,28 +21,42 @@ def main():
 	s = Session()
 	req1 = s.get("https://www.skihood.com/login")
 
-	validator = get_even_validation(str(req1.text))
+	
 
 	params = {}
 
-	#params["__VIEWSTATE"] = get_even_validation(str(req1.text) , "__VIEWSTATE")
+	# params["__VIEWSTATE"] = get_view_state(str(req1.text))
+	# params["__VIEWSTATEGENERATOR"] = get_view_state_gen(str(req1.text))
+	# validator = get_even_validation(str(req1.text))
+	# params["__EVENTVALIDATION"] = validator + "&ctl18%24ctl01%24searchValue=&ctl19%24ctl00%24searchValue="
+	# params["&body_0%24username"] = username 
+	# params["&body_0%24password"] = password 
+	# params["&body_0%24loginButton"] = "Sign+in"
+	# print(params)
+
+	params["__EVENTTARGET"] = ""
+	params["__EVENTARGUMENT"] = ""
+	params["__VIEWSTATE"] = get_view_state(str(req1.text))
 	params["__VIEWSTATEGENERATOR"] = get_view_state_gen(str(req1.text))
-	params["__EVENTVALIDATION"] = validator + "&ctl18%24ctl01%24searchValue=&ctl19%24ctl00%24searchValue="
-	params["&body_0%24username"] = username 
-	params["&body_0%24password"] = password 
-	params["&body_0%24loginButton"] = "Sign+in"
-	print(params)
+	params["__EVENTVALIDATION"] = get_even_validation(str(req1.text))
+	params["ctl18$ctl01$searchValue"] = ""
+	params["ctl19$ctl00$searchValue"] = ""
+	params["body_0$username"] = username
+	params["body_0$password"] = password
+	params["body_0$loginButton"] = "Sign in"
 
 	#print(params)
 
 	req = s.get("https://www.skihood.com/login" , params = params)
+
+
 	# print(s.headers)
 	# print(s.cookies)
 	# #sprint(s.history)
 	# print('----------------')
 	# print(req.headers)
 	# print(req.cookies)
-	# print(req.history)
+	print(req.history)
 	print("----------------------")
 	print(req.url)
 	print("----------------------")
@@ -67,7 +81,7 @@ def main():
 
 def get_even_validation(text):
 	''' This function takes the login page and returns the tag tokent hat is needed to build a login url'''
-	match = re.search(r'.*id="__EVENTVALIDATION".*value="(.*)".*' , text)
+	match = re.search(r'.*id="__EVENTVALIDATION" value="(.*)".*' , text)
 	if match:
 		return match.group(1)
 	else:
@@ -75,6 +89,13 @@ def get_even_validation(text):
 
 def get_view_state_gen(text):
 	match = re.search(r'id="__VIEWSTATEGENERATOR".*value="(.*)"' , text)
+	if match:
+		return match.group(1)
+	else:
+		return None
+
+def get_view_state(text):
+	match = re.search(r'.*id="__VIEWSTATE" value="(.*)".*' , text)
 	if match:
 		return match.group(1)
 	else:
