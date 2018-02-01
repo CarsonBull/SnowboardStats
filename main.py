@@ -3,6 +3,8 @@ from requests import Session
 import re
 
 
+# It is bad practive to hardcode your username and password into here
+# Either import them from a safe file or have them manually input it
 username = ""
 password = ""
 
